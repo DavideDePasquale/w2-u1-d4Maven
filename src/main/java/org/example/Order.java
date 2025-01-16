@@ -31,6 +31,9 @@ public class Order {
     public void setId(long id) {
         this.id = id;
     }
+    public double getTotal(){
+        return this.products.stream().mapToDouble(Product::getPrice).sum();
+    }
 
     public String getStatus() {
         return status;

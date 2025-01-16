@@ -31,56 +31,47 @@ public class GestioneStream {
 
 
         // ESERCIZIO 1
-        System.out.println("Ordini per cliente:");
-        ordiniPerCliente();
+        System.out.println("ESERCIZIO 1");
+        ordiniPerCliente().forEach((customer, orders) -> {
+            System.out.println("Cliente: " + customer.getName() + " Ordini: " + orders.size());
+            System.out.println(orders);
+        });
+
 
 
         // ESERCIZIO 2
-        System.out.println("Spese per ogni ordine:");
-        stampaTotaleImportoOrdini();
+        System.out.println("ESERCIZIO 2");
+        stampaTotaleImportoOrdini().forEach((customer, total) -> {
+            System.out.println("Cliente: " + customer.getName() + " ha speso : " + total + "€");
+        });
+
 
 
         // ESERCIZIO 3
-        System.out.println("I 4 prodotti più costosi sono:");
+        System.out.println("ESERCIZIO 3");
         prodottiCostosi();
 
 
+
         // ESERCIZIO 4
-        System.out.println("La media degli ordini è :");
+        System.out.println("ESERCIZIO 4");
         mediaOrdini();
 
 
+
         //ESERCIIO 5
-        System.out.println("Somma Importi prodotti per categoria:");
+        System.out.println("ESERCIZIO 5");
         sommaProdottiXCat();
 
-    }
 
-    public static List<Product> getBooks() {
-        List<Product> listaBooks = productList.stream()
-                .filter(product -> product.getCategory().equals("Books") && product.getPrice() > 100)
-                .collect(Collectors.toList());
-        return listaBooks;
-    }
 
-    public static List<Order> getBabyOrders() {
-        List<Order> listaBaby = orderList.stream()
-                .filter(order -> order.getProducts()
-                        .stream().anyMatch(product -> product.getCategory().equals("Baby")))
-                .toList();
-        return listaBaby;
-    }
+        //ESERCIZIO 6
 
-    public static List<Product> scontoBoys() {
-        List<Product> listaBoys = productList.stream().filter(product -> product.getCategory().equals("Boys")).map(product -> new Product(product.getId(), product.getName(), product.getCategory(), product.getPrice() * 0.9)).toList();
-        return listaBoys;
-    }
 
-    public static List<Order> prodOrdinati() {
-        LocalDate dataMin = LocalDate.of(2021, 2, 1);
-        LocalDate dataMax = LocalDate.of(2021, 4, 1);
-        List<Order> listaOrdine = orderList.stream().filter(order -> order.getCustomer().getTier() == 2 && order.getOrderDate().isAfter(dataMin) && order.getOrderDate().isBefore(dataMax)).toList();
-        return listaOrdine;
+
+
+        //ESERCIZIO 7
+
     }
 
     public static void createProductList() {
@@ -142,29 +133,26 @@ public class GestioneStream {
 
     }
 
-    public static void ordiniPerCliente() {
-        Map<Customer, List<Order>> listaOrdXCli = orderList.stream().collect(Collectors.groupingBy(Order::getCustomer));
-        listaOrdXCli.forEach((key, value) -> {
-                    System.out.println("Cliente: " + key.getName());
-                    value.forEach(order -> System.out.println("Ordine: " + order.getId() + ", Data ordine: " + order.getOrderDate() + ", e spedito il " + order.getDeliveryDate() + " ( " + order.getProducts() + " )"));
-                }
-        );
+    //METODO ES1
+    public static Map<Customer, List<Order>> ordiniPerCliente() {
+        return orderList.stream().collect(Collectors.groupingBy(Order::getCustomer));
     }
-
-        public static void stampaTotaleImportoOrdini() {
-            Map<Customer, Double> spesaPerCliente = orderList.stream().collect(Collectors.groupingBy(Order::getCustomer, Collectors.summingDouble(order -> order.getProducts().stream().mapToDouble(Product::getPrice).sum())));
-            spesaPerCliente.forEach((cliente, spesa) -> System.out.println("Il cliente: " + cliente.getName() + " ha speso " + spesa + "€"));
-
-
+    //METODO ES2
+        public static Map<Customer, Double> stampaTotaleImportoOrdini() {
+          return orderList.stream()
+                  .collect(Collectors.groupingBy(Order::getCustomer, Collectors.summingDouble(Order::getTotal)));
         }
+    //METODO ES3
         public static void prodottiCostosi(){
              List<Product> prodottiCostosi = productList.stream().sorted(Comparator.comparingDouble(Product::getPrice).reversed()).limit(4).toList();
         prodottiCostosi.forEach((prodotto) -> System.out.println("Prodotto: " + prodotto.getName() + " Costo: " + prodotto.getPrice() + "€"));
     }
+    //METODO ES4
     public static void mediaOrdini(){
          Double mediaCostoOrdini = orderList.stream().mapToDouble(order -> order.getProducts().stream().mapToDouble(Product::getPrice).sum()).average().orElse(0);
         System.out.println(mediaCostoOrdini);
     }
+    //METODO ES5
     public static void sommaProdottiXCat(){
         Map<String, Double> listaperCat = productList.stream().collect(Collectors.groupingBy(Product::getCategory,Collectors.summingDouble(Product::getPrice)));
       listaperCat.forEach((categoria,pricefinal)-> System.out.println("Categoria:" + categoria + " Prezzo totale: " + pricefinal));
